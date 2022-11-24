@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="bank_information" model="ir.ui.view">
-        <field name="name">bank_informaition</field>
-        <field name="model">res.bank</field>
-        <field name="inherit_id" ref="base.view_res_bank_form"/>
-        <field name="arch" type="xml">
-            <field name="name" position="after">
-                <field name="branch_name"/>
-                <field name="bank_code"/>
-                <field name="branch_code"/>
-                <field name="transfer_code"/>
-            </field>
-        </field>
-    </record>
+<!--    <record id="bank_information" model="ir.ui.view">-->
+<!--        <field name="name">bank_informaition</field>-->
+<!--        <field name="model">res.bank</field>-->
+<!--        <field name="inherit_id" ref="base.view_res_bank_form"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <field name="name" position="after">-->
+<!--                <field name="beneficiary"/>-->
+<!--                <field name="account_No"/>-->
+<!--                <field name="swift_code"/>-->
+<!--            </field>-->
+<!--        </field>-->
+<!--    </record>-->
 
 </odoo>

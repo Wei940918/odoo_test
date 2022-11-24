@@ -27,7 +27,6 @@
         # 'security/ir.model.access.csv',
         'views/sale_report_templates.xml',
         'views/sale_report.xml',
-        'views/bank.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
