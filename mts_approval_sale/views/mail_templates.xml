@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="order_generated_notification">
+        <br/>
+        <p>Dear <span t-field="object.approver"/>,</p>
+        <p>The Sale Order <span t-field="object.name"/> has been generated and submitted for your review and approval.</p>
+        <p>Kind Regards,</p>
+        <p>MTS Sale Team</p>
+        <p>--------</p>
+    </template>
+    <template id="quotation_generated_notification">
+        <br/>
+        <p>Dear <span t-field="object.approver_quotation"/>,</p>
+        <p>The quotation <span t-field="object.name"/> has been generated and submitted for your review and approval.</p>
+        <p>Kind Regards,</p>
+        <p>MTS Sale Team</p>
+        <p>--------</p>
+    </template>
+
+    <template id="order_nextapprover_notification">
+        <br/>
+        <p>Dear <span t-field="object.approver"/>,</p>
+        <p>The Sale Order <span t-field="object.name"/> has been approved and is waiting for your review and approval!</p>
+        <p>Kind Regards,</p>
+        <p>MTS Sale Team</p>
+        <p>--------</p>
+    </template>
+    <template id="quotation_nextapprover_notification">
+        <br/>
+        <p>Dear <span t-field="object.approver_quotation"/>,</p>
+        <p>The quotation <span t-field="object.name"/> has been approved and is waiting for your review and approval!</p>
+        <p>Kind Regards,</p>
+        <p>MTS Sale Team</p>
+        <p>--------</p>
+    </template>
+
+    <template id="order_done_notification">
+        <br/>
+        <p>Dear <span t-field="object.create_uid"/>,</p>
+        <p>The Sale Order <span t-field="object.name"/> has been approved.</p>
+        <p>Kind Regards,</p>
+        <p>MTS Sale Team</p>
+        <p>--------</p>
+    </template>
+    <template id="quotation_done_notification">
+        <br/>
+        <p>Dear <span t-field="object.create_uid"/>,</p>
+        <p>The quoted <span t-field="object.name"/> has been approved.</p>
+        <p>Kind Regards,</p>
+        <p>MTS Sale Team</p>
+        <p>--------</p>
+    </template>
+
+    <template id="order_refuse_notification">
+        <br/>
+        <p>Dear <span t-field="object.create_uid"/>,</p>
+        <p>The Sale Order <span t-field="object.name"/> has been refused due to reason: <span t-field="object.refuse_reason"/>.</p>
+        <p>Kind Regards,</p>
+        <p>MTS Sale Team</p>
+        <p>--------</p>
+    </template>
+    <template id="quotation_refuse_notification">
+        <br/>
+        <p>Dear <span t-field="object.create_uid"/>,</p>
+        <p>The quotation <span t-field="object.name"/> has been refused due to reason: <span t-field="object.refuse_reason_quotation"/>.</p>
+        <p>Kind Regards,</p>
+        <p>MTS Sale Team</p>
+        <p>--------</p>
+    </template>
+
+
+
+    <record id="email_submit_quotation_approval_template" model="mail.template">
+            <field name="name">Submit Quotation Approval</field>
+            <field name="subject">Quotation ${object.name}</field>
+            <field name="email_from">matrix@mtscloud.com</field>
+            <field name="email_to">${object.approver_quotation.email_formatted|safe}</field>
+<!--	        <field name="email_cc">${object.parent_id.work_email|safe}</field>-->
+            <field name="model_id" ref="mts_approval_sale.model_sale_order"/>
+            <field name="report_template" ref="mts_sale_quotation_order_invoicing_report_extend.action_report_salequotation"/>
+            <field name="report_name">${(object.name or '').replace('/','_')}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.approver_quotation.email_formatted|safe},</p>
+                <p>The quotation ${object.name} has been generated and submitted for your review and approval.</p>
+                <p>Kind Regards,</p>
+                <p>MTS Sale Team</p>
+                <p>--------</p>
+                <p style="font-size: 12px;">
+                <br></br>
+                Sent by : <strong>${user.company_id.name}</strong>
+                </p>
+            ]]>
+            </field>
+        </record>
+    <record id="email_approval_quotation_approval_template" model="mail.template">
+            <field name="name">Approval Quotation Approval</field>
+            <field name="subject">Quotation ${object.name}</field>
+            <field name="email_from">matrix@mtscloud.com</field>
+            <field name="email_to">${object.approver_quotation.email_formatted|safe}</field>
+<!--	        <field name="email_cc">${object.parent_id.work_email|safe}</field>-->
+            <field name="report_template" ref="mts_sale_quotation_order_invoicing_report_extend.action_report_salequotation"/>
+            <field name="report_name">${(object.name or '').replace('/','_')}</field>
+            <field name="model_id" ref="mts_approval_sale.model_sale_order"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.approver_quotation.email_formatted|safe},</p>
+                <p>The quotation ${object.name} has been approved and is waiting for your review and approval!</p>
+                <p>Kind Regards,</p>
+                <p>MTS Sale Team</p>
+                <p>--------</p>
+                <p style="font-size: 12px;">
+                <br></br>
+                Sent by : <strong>${user.company_id.name}</strong>
+                </p>
+            ]]>
+            </field>
+        </record>
+    <record id="email_approved_quotation_approval_template" model="mail.template">
+            <field name="name">Approved Quotation Approval</field>
+            <field name="subject">Quotation ${object.name}</field>
+            <field name="email_from">matrix@mtscloud.com</field>
+            <field name="email_to">${object.create_uid.email_formatted|safe}</field>
+	        <field name="email_cc">${object.back_quotation_email_cc()|safe}</field>
+<!--            <field name="report_template" ref="mts_sale_quotation_order_invoicing_report_extend.action_report_salequotation"/>-->
+            <field name="model_id" ref="mts_approval_sale.model_sale_order"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.create_uid.email_formatted|safe},</p>
+                <p>The quotation ${object.name} has been approved.</p>
+                <p>Kind Regards,</p>
+                <p>MTS Sale Team</p>
+                <p>--------</p>
+                <p style="font-size: 12px;">
+                <br></br>
+                Sent by : <strong>${user.company_id.name}</strong>
+                </p>
+            ]]>
+            </field>
+        </record>
+    <record id="email_refuse_quotation_approval_template" model="mail.template">
+            <field name="name">Refuse Quotation Approval</field>
+            <field name="subject">Quotation ${object.name}</field>
+            <field name="email_from">matrix@mtscloud.com</field>
+            <field name="email_to">${object.create_uid.email_formatted|safe}</field>
+<!--            <field name="report_template" ref="mts_sale_quotation_order_invoicing_report_extend.action_report_salequotation"/>-->
+            <field name="model_id" ref="mts_approval_sale.model_sale_order"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.create_uid.email_formatted|safe},</p>
+                <p>The quotation ${object.name} has been refused due to reason: ${object.refuse_reason_quotation}</p>
+                <p>Kind Regards,</p>
+                <p>MTS Sale Team</p>
+                <p>--------</p>
+                <p style="font-size: 12px;">
+                <br></br>
+                Sent by : <strong>${user.company_id.name}</strong>
+                </p>
+            ]]>
+            </field>
+        </record>
+    <record id="reset_to_draft_quotation_approval_template" model="mail.template">
+            <field name="name">reset quotation Approval</field>
+            <field name="subject">Quotation ${object.name}</field>
+            <field name="email_from">matrix@mtscloud.com</field>
+            <field name="email_to">${object.create_uid.email_formatted|safe}</field>
+<!--	        <field name="email_cc">${object.parent_id.work_email|safe}</field>-->
+<!--            <field name="report_template" ref="mts_sale_quotation_order_invoicing_report_extend.action_report_salequotation"/>-->
+            <field name="model_id" ref="mts_approval_sale.model_sale_order"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.create_uid.email_formatted|safe},</p>
+                <p>The Quotation ${object.name} needs to go through the approval process again.</p>
+                <p>Kind Regards,</p>
+                <p>MTS Sale Team</p>
+                <p>--------</p>
+                <p style="font-size: 12px;">
+                <br></br>
+                Sent by : <strong>${user.company_id.name}</strong>
+                </p>
+            ]]>
+            </field>
+        </record>
+
+    <record id="email_submit_order_approval_template" model="mail.template">
+            <field name="name">Submit Order Approval</field>
+            <field name="subject">Sale Order ${object.name}</field>
+            <field name="email_from">matrix@mtscloud.com</field>
+            <field name="email_to">${object.approver.email_formatted|safe}</field>
+<!--	        <field name="email_cc">${object.parent_id.work_email|safe}</field>-->
+            <field name="report_template" ref="mts_sale_quotation_order_invoicing_report_extend.action_report_saleorder"/>
+            <field name="report_name">${(object.name or '').replace('/','_')}</field>
+            <field name="model_id" ref="mts_approval_sale.model_sale_order"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.approver.email_formatted|safe},</p>
+                <p>The Sale Order ${object.name} has been generated and submitted for your review and approval.</p>
+                <p>Kind Regards,</p>
+                <p>MTS Sale Team</p>
+                <p>--------</p>
+                <p style="font-size: 12px;">
+                <br></br>
+                Sent by : <strong>${user.company_id.name}</strong>
+                </p>
+            ]]>
+            </field>
+        </record>
+    <record id="email_approval_order_approval_template" model="mail.template">
+            <field name="name">Approval Order Approval</field>
+            <field name="subject">Sale Order ${object.name}</field>
+            <field name="email_from">matrix@mtscloud.com</field>
+            <field name="email_to">${object.approver.email_formatted|safe}</field>
+<!--	        <field name="email_cc">${object.parent_id.work_email|safe}</field>-->
+            <field name="report_template" ref="mts_sale_quotation_order_invoicing_report_extend.action_report_saleorder"/>
+            <field name="report_name">${(object.name or '').replace('/','_')}</field>
+            <field name="model_id" ref="mts_approval_sale.model_sale_order"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.approver.email_formatted|safe},</p>
+                <p>The Sale Order ${object.name} has been approved and is waiting for your review and approval!</p>
+                <p>Kind Regards,</p>
+                <p>MTS Sale Team</p>
+                <p>--------</p>
+                <p style="font-size: 12px;">
+                <br></br>
+                Sent by : <strong>${user.company_id.name}</strong>
+                </p>
+            ]]>
+            </field>
+        </record>
+    <record id="email_approved_order_approval_template" model="mail.template">
+            <field name="name">Approved Order Approval</field>
+            <field name="subject">Sale Order ${object.name}</field>
+            <field name="email_from">matrix@mtscloud.com</field>
+            <field name="email_to">${object.create_uid.email_formatted|safe}</field>
+	        <field name="email_cc">${object.back_order_email_cc()|safe}</field>
+            <field name="model_id" ref="mts_approval_sale.model_sale_order"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.create_uid.email_formatted|safe},</p>
+                <p>The Sale Order ${object.name} has been approved.</p>
+                <p>Kind Regards,</p>
+                <p>MTS Sale Team</p>
+                <p>--------</p>
+                <p style="font-size: 12px;">
+                <br></br>
+                Sent by : <strong>${user.company_id.name}</strong>
+                </p>
+            ]]>
+            </field>
+        </record>
+    <record id="email_refuse_order_approval_template" model="mail.template">
+            <field name="name">Refuse Sale Order Approval</field>
+            <field name="subject">Sale Order ${object.name}</field>
+            <field name="email_from">matrix@mtscloud.com</field>
+            <field name="email_to">${object.create_uid.email_formatted|safe}</field>
+            <field name="model_id" ref="mts_approval_sale.model_sale_order"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.create_uid.email_formatted|safe},</p>
+                <p>The Sale Order ${object.name} has been refused due to reason: ${object.refuse_reason}</p>
+                <p>Kind Regards,</p>
+                <p>MTS Sale Team</p>
+                <p>--------</p>
+                <p style="font-size: 12px;">
+                <br></br>
+                Sent by : <strong>${user.company_id.name}</strong>
+                </p>
+            ]]>
+            </field>
+
+        </record>
+    <record id="reset_to_draft_order_approval_template" model="mail.template">
+            <field name="name">reset Order Approval</field>
+            <field name="subject">Sale Order ${object.name}</field>
+            <field name="email_from">matrix@mtscloud.com</field>
+            <field name="email_to">${object.create_uid.email_formatted|safe}</field>
+<!--	        <field name="email_cc">${object.parent_id.work_email|safe}</field>-->
+            <field name="model_id" ref="mts_approval_sale.model_sale_order"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.create_uid.email_formatted|safe},</p>
+                <p>The Sale Order ${object.name} needs to go through the approval process again.</p>
+                <p>Kind Regards,</p>
+                <p>MTS Sale Team</p>
+                <p>--------</p>
+                <p style="font-size: 12px;">
+                <br></br>
+                Sent by : <strong>${user.company_id.name}</strong>
+                </p>
+            ]]>
+            </field>
+        </record>
+    <record id="reset_to_new_quotation_approval_template" model="mail.template">
+            <field name="name">reset new quotation Approval</field>
+            <field name="subject">Sale Order ${object.name}</field>
+            <field name="email_from">matrix@mtscloud.com</field>
+            <field name="email_to">${object.create_uid.email_formatted|safe}</field>
+<!--	        <field name="email_cc">${object.parent_id.work_email|safe}</field>-->
+            <field name="model_id" ref="mts_approval_sale.model_sale_order"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.create_uid.email_formatted|safe},</p>
+                <p>The Sale Order ${object.name} needs to start again with the quotation!</p>
+                <p>Kind Regards,</p>
+                <p>MTS Sale Team</p>
+                <p>--------</p>
+                <p style="font-size: 12px;">
+                <br></br>
+                Sent by : <strong>${user.company_id.name}</strong>
+                </p>
+            ]]>
+            </field>
+        </record>
+
+    <record id="email_template_edi_sale_congxieQuotation" model="mail.template">
+            <field name="name">Sales Order: Send by email</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="email_from">${object.user_id.email_formatted |safe}</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="subject">${object.company_id.name} ${object.state in ('draft', 'sent') and 'Quotation' or 'Order'} (Ref ${object.name or 'n/a' })</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+        Dear ${object.partner_id.child_ids.title.name}${object.partner_id.child_ids.name}
+        <br /><br />
+        Thank you very much for your inquiry.
+        <br /><br />
+        Please, find the quotation attached.
+        <br /><br />
+        Do not hesitate to get in touch if you have any questions or would like to clarify anything.
+        <br/><br/>
+        Sincerely,
+        <br/><br/><br/>
+        <strong>${object.employee_id.name} - ${object.employee_id.job_title}</strong><br/>
+        <strong>${object.company_id.name}</strong><br/>
+        <strong>${object.company_id.street}</strong><br/>
+        <strong>Tel ${object.employee_id.work_phone}   |   Direct ${object.employee_id.mobile_phone}</strong>
+    </p>
+</div>
+            </field>
+            <field name="report_template" ref="mts_sale_quotation_order_invoicing_report_extend.action_report_salequotation"/>
+            <field name="report_name">${(object.name or '').replace('/','_')}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="user_signature" eval="False"/>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    <record id="email_template_edi_sale_congxieOrder" model="mail.template">
+            <field name="name">Sales Order: Send by email</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="email_from">${object.user_id.email_formatted |safe}</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="subject">${object.company_id.name} ${object.state in ('draft', 'sent') and 'Quotation' or 'Order'} (Ref ${object.name or 'n/a' })</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+        Dear ${object.partner_id.child_ids.title.name}${object.partner_id.child_ids.name}
+        <br /><br />
+        Thank you for your order.
+        <br /><br />
+        Attached please find the Sales Order Confirmation.
+        <br /><br />
+        Please contact me directly anytime you have additional questions or requests.
+        <br/><br/>
+        Sincerely,
+        <br/><br/><br/>
+        <strong>${object.employee_id.name} - ${object.employee_id.job_title}</strong><br/>
+        <strong>${object.company_id.name}</strong><br/>
+        <strong>${object.company_id.street}</strong><br/>
+        <strong>Tel ${object.employee_id.work_phone}   |   Direct ${object.employee_id.mobile_phone}</strong>
+    </p>
+</div>
+            </field>
+            <field name="report_template" ref="mts_sale_quotation_order_invoicing_report_extend.action_report_saleorder"/>
+            <field name="report_name">${(object.name or '').replace('/','_')}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="user_signature" eval="False"/>
+            <field name="auto_delete" eval="True"/>
+        </record>
+
+</odoo>

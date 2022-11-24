@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_sale_order_approval_approbation_Own,sale.order.approval.approbation_own,model_sale_order_approval_approbation,sales_team.group_sale_salesman,1,1,1,1
+access_sale_order_approval_approbation_All,sale.order.approval.approbation_all,model_sale_order_approval_approbation,sales_team.group_sale_salesman_all_leads,1,1,1,1
+access_sale_order_approval_approbation_Manager,sale.order.approval.approbation_manager,model_sale_order_approval_approbation,sales_team.group_sale_manager,1,1,1,1
+access_sale_order_approval_approbation_mix,sale.order.approval.approbation_mix,model_sale_order_approval_approbation,,1,1,1,1
+access_mts_sale_reason,mts_sale_reason,model_sale_closed_reason,,1,1,1,1

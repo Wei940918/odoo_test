@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="mail_act_quotation_approval" model="mail.activity.type">
+            <field name="name">quotation Approval</field>
+            <field name="icon">fa-dollar</field>
+            <field name="res_model_id" ref="sale.model_sale_order"/>
+        </record>
+
+        <record id="mail_act_sale_order_approval" model="mail.activity.type">
+            <field name="name">sale order Approval</field>
+            <field name="icon">fa-dollar</field>
+            <field name="res_model_id" ref="sale.model_sale_order"/>
+        </record>
+    </data>
+</odoo>

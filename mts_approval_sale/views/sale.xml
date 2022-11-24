@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+		<record id="sale_menu_inherit" model="ir.ui.view">
+			<field name="name">sale.menu</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale.report_saleorder"/>
+			<field name="arch" type="xml">
+				<xpath expr="//t/t/t" position="attributes">
+					<attribute name="t-call">null</attribute>
+				</xpath>
+			</field>
+		</record>
+
+	<!--rewrite domain order menu (status: sent)-->
+ 	<record id="sale.menu_sale_order" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+	<record id="action_orders_copy" model="ir.actions.act_window">
+            <field name="name">Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+            <field name="search_view_id" ref="sale.sale_order_view_search_inherit_sale"/>
+            <field name="context">{}</field>
+            <field name="domain">[('state', 'not in', ('draft', 'cancel'))]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new quotation, the first step of a new sale!
+                </p><p>
+                    Once the quotation is confirmed, it becomes a sales order.<br/> You will be able to create an invoice and collect the payment.
+                </p>
+            </field>
+        </record>
+	<menuitem id="menu_sale_order_two"
+			name="Orders"
+            action="action_orders_copy"
+            parent="sale.sale_order_menu"
+            sequence="2" groups="sales_team.group_sale_salesman"/>
+
+
+	<record id="sale_form_inherit" model="ir.ui.view">
+		<field name="name">sale.approval</field>
+		<field name="model">sale.order</field>
+		<field name="inherit_id" ref="sale.view_order_form" />
+		<field name="arch" type="xml">
+
+			<xpath expr="//header/button[@name='action_confirm'][2]" position="replace">
+			</xpath>
+
+			<xpath expr="//header/button[@name='print_quotation'][2]" position="replace">
+				<button name="print_quotation" string="Print" type="object" states="quotation approved" class="btn-primary o_sale_print"/>
+			</xpath>
+			<xpath expr="//header/button[@name='print_quotation'][1]" position="replace">
+			</xpath>
+
+			<xpath expr="//header/button[@name='action_quotation_send'][4]" position="replace">
+			</xpath>
+			<xpath expr="//header/button[@name='action_quotation_send'][1]" position="replace">
+			</xpath>
+
+			<field name="confirmation_date" position="replace">
+				<field name="confirmation_date" widget="date" attrs="{'invisible': [('state', 'in', ['draft', 'sent', 'cancel'])]}"/>
+			</field>
+			<field name="expected_date" position="replace">
+				<field name="expected_date" widget="date" groups="sale.group_sale_order_dates"/>
+			</field>
+			<field name="date_order" position="replace">
+				<field name="date_order" widget="date" attrs="{'required': [('state', '!=', 'draft')]}"/>
+			</field>
+
+			<xpath expr="//button[@name='action_done']" position="after">
+				<button name="action_reopen" string="Reopen" type="object" states="close" class="btn-primary o_sale_print" groups="sales_team.group_sale_manager"/>
+				<button name="action_terminate" string="Mark Terminate" type="object" states="sale" class="btn-primary o_sale_print" groups="sales_team.group_sale_manager"/>
+
+				<button name="mts_approval_sale.sale_closed_action" string="Mark Close"
+								groups="sales_team.group_sale_manager"
+                                type="action" class="oe_highlight"
+                                attrs="{'invisible': [('state', 'not in', ('sale', 'sent', 'quotation approved'))]}"/>
+			</xpath>
+			<field name='note' position="after">
+                <field name='sale_id' attrs="{'invisible': [('state', 'not in', ['close'])]}"/>
+                <field name='closed_reason' attrs="{'invisible': [('state', 'not in', ['close'])]}"/>
+			</field>
+
+			<xpath expr="//field[@name='state']" position="attributes">
+				<attribute name="statusbar_visible">draft,quotation approval,quotation approved,refuse quotation,sent,order approval,sale,refuse order,close</attribute>
+			</xpath>
+			<xpath expr="//button[@id='action_confirm']" position="attributes">
+				<attribute name="invisible">True</attribute>
+			</xpath>
+<!--			<xpath expr="//button[@name='action_cancel']" position="attributes">-->
+<!--				<attribute name="states"></attribute>-->
+<!--			</xpath>-->
+			<xpath expr="//button[@name='action_cancel']" position="attributes">
+				<attribute name="invisible">True</attribute>
+			</xpath>
+<!--			<xpath expr="//button[@name='action_cancel']" position="attributes">-->
+<!--				<attribute name="attrs">{'invisible': ('current_user_is_requester', '!=', True)}</attribute>-->
+<!--			</xpath>-->
+
+			<button name="action_quotation_send" position="before">
+				<field name="current_user_is_requester" invisible="True"/>
+
+                <button string="Send Approval" name="action_confirm_approval" type="object"
+						attrs="{'invisible': [('state', 'not in', ('', 'sent'))]}"
+						class="oe_highlight" />
+				<field name="current_user_is_approver" invisible="True" />
+                <button string="Approve" name="action_approve" type="object"
+					attrs="{'invisible': ['|', ('current_user_is_approver', '!=', True), ('state', '!=', 'order approval')]}"
+					class="oe_highlight" />
+				<button string="Refuse" name="mts_approval_sale.order_refused_reason_action" type="action"
+					attrs="{'invisible': ['|', ('current_user_is_approver', '!=', True), ('state', '!=', 'order approval')]}"/>
+
+				<button string="Cancel" name="action_draft_approval" type="object"
+                         attrs="{'invisible': ['|', ('current_user_is_requester', '!=', True), ('state', 'not in', ['order approval','order approved', 'refuse order'])]}"/>
+
+<!--				<button string="Cancel" name="action_draft_approval" type="object"-->
+<!--                         attrs="{'invisible': [('state', 'not in', ['sale',''])]}"/>-->
+
+				<field name="current_user_is_requester_quotation" invisible="True" />
+				<button string="Send Approval" name="action_confirm_approval_quotation" type="object"
+						attrs="{'invisible': [('state', '!=', 'draft')]}"
+					class="oe_highlight" />
+				<field name="current_user_is_approver_quotation" invisible="True" />
+				<button string="Approve" name="action_approve_quotation" type="object"
+					attrs="{'invisible': ['|', ('current_user_is_approver_quotation', '!=', True), ('state', '!=', 'quotation approval')]}"
+					class="oe_highlight" />
+				<button string="Refuse" name="mts_approval_sale.quotation_refused_reason_action" type="action"
+					attrs="{'invisible': ['|', ('current_user_is_approver_quotation', '!=', True), ('state', '!=', 'quotation approval')]}"/>
+				<button string="Cancel" name="action_draft_approval_quotation" type="object"
+                         attrs="{'invisible': ['|', ('current_user_is_requester_quotation', '!=', True), ('state', 'not in', ['quotation approval', 'quotation approved', 'refuse quotation', 'sent'])]}"/>
+				</button>
+
+			<field name="partner_id" position="after">
+                <field name="approval_list" attrs="{
+                'required': [('state', 'in', ['sent', 'order approval', 'sale', 'close', 'done', 'refuse order'])],
+                'invisible': [('state', 'in', ['draft', 'quotation approval', 'refuse quotation'])]
+                }"/>
+				<field name="approver" attrs="{'invisible': [('state', 'in', ['draft', 'quotation approval', 'refuse quotation'])]}"/>
+				<field name="approval_flow_id" readonly="1" force_save="1" invisible="1"/>
+				<field name="employee_id" readonly="1" force_save="1" invisible="1"/>
+			</field>
+
+			<field name="partner_id" position="after">
+                <field name="approval_list_quotation" attrs="{'invisible': [('state', 'in', ['sent', 'order approval', 'refuse order','sale','quotation approved'])]}"/>
+				<field name="approver_quotation" attrs="{'invisible': [('state', 'in', ['sent', 'order approval', 'refuse order','sale','quotation approved'])]}"/>
+				<field name="approval_flow_id_quotation" readonly="1" force_save="1" invisible="1"/>
+			</field>
+			<xpath expr="//notebook//page[@name='other_information']" position="after">
+				<page string="Quotation Approved" id="approval_approbations_quotation">
+					<field name="approval_approbations_quotation">
+						<tree>
+							<field name="approver"/>
+							<field name="date"/>
+							<field name="status"/>
+							<field name="comments"/>
+						</tree>
+					</field>
+				</page>
+				<page string="Order Approved" id="approval_approbations">
+					<field name="approval_approbations">
+						<tree>
+							<field name="approver"/>
+							<field name="date"/>
+							<field name="status"/>
+							<field name="comments"/>
+						</tree>
+					</field>
+				</page>
+			</xpath>
+		</field>
+	</record>
+
+
+	<record id="sale_tree_approval" model="ir.ui.view">
+        <field name="name">sale.tree.toApproval</field>
+        <field name="model">sale.order</field>
+		<field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="mode">primary</field>
+        <field name="priority">32</field>
+        <field name="arch" type="xml">
+			<xpath expr="//tree" position="attributes">
+				<attribute name="create">false</attribute>
+			</xpath>
+        </field>
+    </record>
+<!--invisible="1"-->
+	<record id="action_sale_toApproval" model="ir.actions.act_window">
+        <field name="name">To Order Approval</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+		<field name="view_id" ref="sale_tree_approval"/>
+		<field name="domain">[('state','=','order approval'),'|',('create_uid','=',uid),('approver', '=', uid)]</field></record>
+
+
+	<menuitem id="menu_sale_toApproval" name="To Order Approval" parent="sale.sale_menu_root"
+        sequence="101" groups="base.group_user" action="action_sale_toApproval"/>
+
+	<record id="action_sale_approved" model="ir.actions.act_window">
+        <field name="name">Order Approved</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+		<field name="view_id" ref="sale_tree_approval"/>
+		<field name="domain">[('state','=','sale'),'|','|',('create_uid','=',uid),('approver','=',uid),('approval_list.flow.approver', '=', uid)]</field>
+    </record>
+
+	<menuitem id="menu_sale_approved" name="Order Approved" parent="sale.sale_menu_root"
+        sequence="101" groups="base.group_user" action="action_sale_approved"/>
+
+	<record id="action_sale_toApproval_quotation" model="ir.actions.act_window">
+        <field name="name">To Quotation Approval</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+		<field name="view_id" ref="sale_tree_approval"/>
+		<field name="domain">[('state','=','quotation approval'),'|',('create_uid','=',uid),('approver_quotation', '=', uid)]</field>
+    </record>
+
+	<menuitem id="menu_sale_toApproval_order" name="To Quoted Approval" parent="sale.sale_menu_root"
+        sequence="102" groups="base.group_user" action="action_sale_toApproval_quotation"/>
+<!--        sequence="102" groups="sales_team.group_sale_manager" action="action_sale_toApproval_quotation"/>-->
+
+	<record id="action_sale_approved_quotation_q" model="ir.actions.act_window">
+        <field name="name">Approved Quotation</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+		<field name="view_id" ref="sale_tree_approval"/>
+		<field name="domain">[('state','=','quotation approved'),'|','|',('create_uid','=',uid),('approver_quotation','=',uid),('approval_list_quotation.flow.approver', '=', uid)]</field>
+    </record>
+
+	<menuitem id="menu_sale_approved_order_o" name="Approved Quotation" parent="sale.sale_menu_root"
+        sequence="102" groups="base.group_user" action="action_sale_approved_quotation_q"/>
+
+
+
+        <!-- Configuration/Lead & Opporotunities/Lost Reasons Menu -->
+        <record id="sale_closed_reason_action" model="ir.actions.act_window">
+            <field name="name">Closed Reasons</field>
+            <field name="res_model">sale.closed.reason</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Define a new closed reason
+              </p><p>
+                Use lost reasons to explain why an opportunity is closed.
+              </p><p>
+                Some examples of closed reasons: "We don't have people/skill", "Price too high"
+              </p>
+            </field>
+        </record>
+
+        <menuitem
+            id="menu_sale_lost_reason"
+            action="sale_closed_reason_action"
+            parent="sale.menu_sale_config"
+            sequence="6"/>
+
+    <record id="account_from_sale_order" model="ir.actions.act_window">
+        <field name="name">Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('analytic_account_id', '=', active_id)]</field>
+    </record>
+
+	<record id="view_account_form_inherit_analytic_line" model="ir.ui.view">
+            <field name="name">analytic.analytic.account</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="analytic.view_account_analytic_account_form" />
+            <field name="arch" type="xml">
+				<data>
+				   <xpath expr="//form/sheet/div/button[@name='toggle_active']" position="after">
+					   <button type="action"
+						   name="mts_approval_sale.account_from_sale_order"
+						   class="oe_stat_button"
+						   icon="fa-money"
+						   attrs="{'invisible': [('order_count', '=', 0)]}">
+						   <field name="order_count" widget="statinfo" string="Orders"/>
+					   </button>
+					</xpath>
+            	</data>
+			</field>
+	</record>
+
+</odoo>

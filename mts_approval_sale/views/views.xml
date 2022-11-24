@@ -1,0 +1,60 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+    <!--
+    <record model="ir.ui.view" id="mts_approval_sale.list">
+      <field name="name">mts_approval_sale list</field>
+      <field name="model">mts_approval_sale.mts_approval_sale</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="value"/>
+          <field name="value2"/>
+        </tree>
+      </field>
+    </record>
+    -->
+
+    <!-- actions opening views on models -->
+    <!--
+    <record model="ir.actions.act_window" id="mts_approval_sale.action_window">
+      <field name="name">mts_approval_sale window</field>
+      <field name="res_model">mts_approval_sale.mts_approval_sale</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    -->
+
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="mts_approval_sale.action_server">
+      <field name="name">mts_approval_sale server</field>
+      <field name="model_id" ref="model_mts_approval_sale_mts_approval_sale"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <!-- Top menu item -->
+    <!--
+    <menuitem name="mts_approval_sale" id="mts_approval_sale.menu_root"/>
+    -->
+    <!-- menu categories -->
+    <!--
+    <menuitem name="Menu 1" id="mts_approval_sale.menu_1" parent="mts_approval_sale.menu_root"/>
+    <menuitem name="Menu 2" id="mts_approval_sale.menu_2" parent="mts_approval_sale.menu_root"/>
+    -->
+    <!-- actions -->
+    <!--
+    <menuitem name="List" id="mts_approval_sale.menu_1_list" parent="mts_approval_sale.menu_1"
+              action="mts_approval_sale.action_window"/>
+    <menuitem name="Server to list" id="mts_approval_sale" parent="mts_approval_sale.menu_2"
+              action="mts_approval_sale.action_server"/>
+    -->
+  </data>
+</odoo>
