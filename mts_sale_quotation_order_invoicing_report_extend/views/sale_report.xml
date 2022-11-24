@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            id="action_report_salequotation"
+            string="MTS Quotation"
+            model="sale.order"
+            report_type="qweb-pdf"
+            file="mts_sale_quotation_order_invoicing_report_extend.report_salequotation"
+            name="mts_sale_quotation_order_invoicing_report_extend.report_salequotation"
+            print_report_name="(object.state in ('draft', 'sent') and 'Quotation - %s' % (object.name)) or 'Order - %s' % (object.name)"
+        />
+
+        <report
+            id="action_report_saleorder"
+            string="MTS Order"
+            model="sale.order"
+            report_type="qweb-pdf"
+            file="mts_sale_quotation_order_invoicing_report_extend.report_saleorder"
+            name="mts_sale_quotation_order_invoicing_report_extend.report_saleorder"
+            print_report_name="(object.state in ('draft', 'sent') and 'Order - %s' % (object.name)) or 'Order - %s' % (object.name)"
+        />
+
+    </data>
+</odoo>
